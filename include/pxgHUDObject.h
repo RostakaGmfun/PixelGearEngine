@@ -8,6 +8,7 @@
 #define PXG_HUD_Object
 
 #include <pxgNode.h>
+#include <pxgCallback.h>
 
 #include <string>
 
@@ -20,6 +21,13 @@ enum PXG_HUD_TYPE
 {
     PXG_HUD_TEXTURE,
     PXG_HUD_TEXT
+};
+
+enum PXG_HUDSTYLE_TYPE
+{
+    PXG_HUDSTYLE_NORMAL,
+    PXG_HUDSTYLE_HOVERED,
+    PXG_HUDSTYLE_CLICKED
 };
 
 class pxgHUDObject
@@ -48,6 +56,10 @@ public:
     void SetFont(std::string fontName) { font = fontName; }
     std::string GetFont() const { return font; }
 
+    void NormalStyleCallback(pxgCallback<void, pxgHUDObject*, void*>* cb);
+    void HoveredStyleCallback(pxgCallback<void, pxgHUDObject*, void*>* cb);
+    void ClickedStyleCallback(pxgCallback<void, pxgHUDObject*, void*>* cb);
+
 private:
     float rotation;
     glm::vec2 size;
@@ -59,6 +71,8 @@ private:
     PXG_HUD_TYPE type;
     std::string font;
     bool visible;
+
+    PXG_HUDSTYLE_TYPE hudStyle;
 };
 
 #endif //PXG_HUD_Object

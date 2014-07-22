@@ -20,7 +20,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include <SOIL.h>
+#include <../SOIL.h>
 #include <pxgTools.h>
 
 

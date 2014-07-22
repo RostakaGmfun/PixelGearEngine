@@ -65,7 +65,8 @@ HEADERS += \
     ../include/pxgTexturePool.h \
     ../include/pxgInstanceGroup.h \
     ../include/pxgTools.h \
-    ../include/pxgLogicalObject.h
+    ../include/pxgLogicalObject.h \
+    ../include/pxgHUDWidget.h
 
 
 unix:!macx: LIBS += -L$$PWD/../../bullet-2.82-r2704/Extras/Serialize/BulletFileLoader/ -lBulletFileLoader

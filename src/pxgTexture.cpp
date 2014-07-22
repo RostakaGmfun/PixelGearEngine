@@ -5,7 +5,7 @@
  */
 
 #include <pxgTexture.h>
-#include <SOIL.h>
+#include <../SOIL.h>
 #include <pxgTools.h>
 
 #include <fstream>
