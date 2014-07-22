@@ -21,6 +21,7 @@ typedef unsigned int GLuint;
 struct pxgVertex2dT;
 
 class pxgHUDObject;
+class pxgHUDWidget;
 class pxgShader;
 class pxgBuffer;
 
@@ -41,6 +42,7 @@ public:
     bool Init(float width, float height);
     void Reshape(float width, float height);
     void AddHUD(pxgHUDObject* hud);
+    void AddWidget(pxgHUDWidget* w);
     bool LoadFont(std::string name, float size);
     void Render();
     void Update();
@@ -53,6 +55,7 @@ public:
 
 private:
     std::vector<pxgHUDObject*> huds;
+    std::vector<pxgHUDWidget*> widgets;
     float rotation;
     float scaling;
     glm::vec2 translationVector;

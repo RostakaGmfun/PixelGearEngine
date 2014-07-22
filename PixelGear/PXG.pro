@@ -85,4 +85,5 @@ unix:!macx: PRE_TARGETDEPS += $$PWD/../../bullet-2.82-r2704/Extras/Serialize/Bul
 
 OTHER_FILES += \
     ../README \
-    ../LICENCE
+    ../LICENCE \
+    ../README.md

@@ -11,6 +11,7 @@
 #include <pxgBuffer.h>
 #include <pxgVertexLayouts.h>
 #include <pxgTools.h>
+#include <pxgHUDWidget.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/vec3.hpp>
@@ -187,6 +188,13 @@ void pxgHUDManager::AddHUD(pxgHUDObject* hud)
     huds.push_back(hud);
 }
 
+void pxgHUDManager::AddWidget(pxgHUDWidget* widget)
+{
+    if(!widget)
+        return;
+    widgets.push_back(widget);
+}
+
 void pxgHUDManager::Render()
 {
                 glDisable(GL_CULL_FACE);
@@ -239,6 +247,8 @@ void pxgHUDManager::Render()
                     }
                 }
     glEnable(GL_CULL_FACE);
+    for(int i = 0;i<widget.size();i++)
+        widgets[i]->Render();
     return;
 }
 

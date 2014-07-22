@@ -16,6 +16,7 @@
 
 class pxgHUDManager;
 class pxgTexture;
+class pxgHUDWidget;
 
 enum PXG_HUD_TYPE
 {
@@ -56,6 +57,8 @@ public:
     void SetFont(std::string fontName) { font = fontName; }
     std::string GetFont() const { return font; }
 
+    void SetStyle(PXG_HUDSTYLE_TYPE t);
+
     void NormalStyleCallback(pxgCallback<void, pxgHUDObject*, void*>* cb);
     void HoveredStyleCallback(pxgCallback<void, pxgHUDObject*, void*>* cb);
     void ClickedStyleCallback(pxgCallback<void, pxgHUDObject*, void*>* cb);
@@ -73,6 +76,10 @@ private:
     bool visible;
 
     PXG_HUDSTYLE_TYPE hudStyle;
+    pxgCallback<void, pxgHUDObject*, void*>* normalStyleCallback;
+    pxgCallback<void, pxgHUDObject*, void*>* hoveredStyleCallback;
+    pxgCallback<void, pxgHUDObject*, void*>* clickedStyleCallback;
+    pxgHUDWidget* widget;
 };
 
 #endif //PXG_HUD_Object
