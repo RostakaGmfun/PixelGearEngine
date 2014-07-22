@@ -10,7 +10,7 @@
 #include <string>
 #include <glm/fwd.hpp>
 #include <GL/gl.h>
-#include "glext.h"
+#include <GL/glext.h>
 
 
 bool FileExists(std::string fname);
