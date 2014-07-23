@@ -7,6 +7,8 @@
 #ifndef PXGHUDWIDGET_H
 #define PXGHUDWIDGET_H
 
+#include <vector>
+
 class pxgHUDManager;
 class pxgHUDObject;
 
@@ -19,6 +21,10 @@ public:
     void RemoveObject(pxgHUDObject* o);
     pxgHUDObject* GetHoveredObject();
     pxgHUDObject* GetClickedObject();
+
+private:
+    pxgHUDManager* hudMan;
+    std::vector<pxgHUDObject*> objects;
 };
 
 #endif // PXGHUDWIDGET_H

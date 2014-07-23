@@ -33,7 +33,8 @@ SOURCES += \
     ../src/pxgInstanceGroup.cpp \
     ../src/pxgCollisionShape.cpp \
     ../src/pxgTools.cpp \
-    ../src/pxgWorld.cpp
+    ../src/pxgWorld.cpp \
+    ../src/pxgHUDWidget.cpp
 
 
 HEADERS += \

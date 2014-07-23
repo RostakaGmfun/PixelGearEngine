@@ -53,6 +53,8 @@ public:
     float GetRoation() const { return rotation; }
     float GetScaling() const { return scaling; }
 
+    void RenderObject(pxgHUDObject* o);
+
 private:
     std::vector<pxgHUDObject*> huds;
     std::vector<pxgHUDWidget*> widgets;

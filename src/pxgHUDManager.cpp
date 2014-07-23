@@ -247,9 +247,63 @@ void pxgHUDManager::Render()
                     }
                 }
     glEnable(GL_CULL_FACE);
-    for(int i = 0;i<widget.size();i++)
+    for(int i = 0;i<widgets.size();i++)
         widgets[i]->Render();
     return;
+}
+
+void pxgHUDManager::RenderObject(pxgHUDObject* o)
+{
+    if(!o)
+        return;
+    glDisable(GL_CULL_FACE);
+    glActiveTexture(GL_TEXTURE0);
+
+    if(!o->IsVisible())
+        return;
+    if(o->GetType()==PXG_HUD_TEXTURE)
+    {
+        PXG::glBindVertexArray(vertexArray);
+            if(shader!=NULL)
+                if(!shader->Use())
+                    return;
+        if(squareVerts!=NULL)
+            if(!squareVerts->Use())
+                return;
+        if(squareIndices!=NULL)
+            squareIndices->Use();
+        shader->SetUniform("ortho",glm::value_ptr(ortho));
+        shader->SetUniform("transformation",glm::value_ptr(o->GetTransformation()));
+        shader->Use();
+        int ut;
+        if(o->Render())
+            ut = 1;
+        else
+            ut = 0;
+        shader->SetUniform("useTexture", &ut);
+        shader->SetUniform("color", glm::value_ptr(o->GetColor()));
+        glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,NULL);
+
+    }
+    else
+    {
+        PXG::glBindVertexArray(glyphsVAO);
+        PXG::glBindBuffer(GL_ARRAY_BUFFER,glyphVB);
+        if(squareIndices!=NULL)
+            squareIndices->Use();
+        if(fontShader!=NULL)
+            if(!fontShader->Use())
+                return;
+        if(fonts.find(o->GetFont())!=fonts.end())
+            currentFont = fonts[o->GetFont()];
+        else
+            return;
+        fontShader->SetUniform("ortho",glm::value_ptr(ortho));
+        fontShader->SetUniform("color", glm::value_ptr(o->GetColor()));
+        DrawText(o);
+    }
+
+    glEnable(GL_CULL_FACE);
 }
 
 void pxgHUDManager::Update()
