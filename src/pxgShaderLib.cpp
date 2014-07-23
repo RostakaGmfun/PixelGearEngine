@@ -443,63 +443,15 @@ pxgShader* pxgShaderLib::InitSkyboxShader()
 
     std::string fs_source =
     "#version 130\n"
-    "in vec3 texCoord;"
-    "out vec4 outColor;"
-    "uniform samplerCube cubemap;"
-    "uniform sampler2D clouds;"
-    "const vec3 sunRot = vec3(1.0,-1.0,0.0);"
-    "const vec4 sunColor = vec4(1,0.4,0.2,1);//vec4(253/255, 184/255, 19/255,1);\n"
-    "const float sunRadius = 1000;"
-    "const vec4 skyColor = vec4(vec3(0,0,1)*0.3,1);"
-    "void main()"
-    "{"
-    //"vec3 TexCoord = texCoord;"
-    //"TexCoord.xy*=sin(90)+cos(90);"
-    //"if(texCoord.y==1)"
-    //    "TexCoord = vec3(texCoord.x,texCoord.y,texCoord.z);"
-   // "vec4 skyColor1 = vec4(0.8,0.7,1,1);"
-    //"vec4 skyColor2 = vec4(0,0.3,2,1);"
-    //"vec3 sphereDir = vec3(0)+texCoord;"
-    //"float clouds"
-   // "outColor = skyColor1*mix(skyColor2,vec4(0.5),clamp(texCoord.y,0,1));"
-    //""
-   // "vec3 t = texCoord-sunRot;"
-   SHADER
-   (
-   /*vec3 delta = texCoord-sunRot;
-    float intensity = 0;
-    if(length(delta)<=sunRadius)
-        intensity = length(delta)/sunRadius;
-    min(intensity,1);
-    outColor+=sunColor*intensity;*/
-  //  float cutoff = cos(radians(45.0));
-  //  vec3 a = -sunRot+texCoord;
-  //  float aDotN = dot(normalize(a),vec3(0,1,0));
-  //  if(aDotN>cutoff)
-  //      outColor = mix(skyColor,sunColor,aDotN);
-  //  else
-  //      outColor = skyColor;
-  // outColor = skyColor(sunColor*dot(normalize(a),vec3(0,1,0)));
-    //outColor = skyColor+sunColor*clamp(dot(normalize(sunRot),normalize(texCoord)),0,1);
-   /* float r = smoothstep(skyColor.r,sunColor.r,dot(normalize(sunRot),normalize(texCoord)));
-    float g = smoothstep(skyColor.g,sunColor.g,dot(normalize(sunRot),normalize(texCoord)));
-    float b = smoothstep(skyColor.b,sunColor.b,dot(normalize(sunRot),normalize(texCoord)));*/
-    outColor = mix(skyColor,sunColor,clamp(dot(normalize(sunRot),normalize(texCoord)),0,1));
-   // outColor = vec4(r,g,b,1);
-   // outColor = skyColor+sunColor*(dot(normalize(sunRot),normalize(texCoord)));
-   )
-   // "float sunR2 = pow(sunRadius,2);"
-   // "float deltaR2 = pow(sunR2,2)-(pow(t,2)-pow(texCoord,2));"
-   //"float d = distance(sunRot,texCoord);"
-   // "float intensity = d/sunRadius;"
-    //"if(clamp(texCoord.y,0,1)>0.7)"
-   // "outColor = mix(outColor,texture(clouds,texCoord.xy),clamp(texCoord.y,0,1)/2);"
-    //"vec3 center = sunRot-texCoord;"
-   /* "if(d>=sunRadius)"
-    "   outColor+= sunColor*intensity;"*/
-    //"outColor+= sunColor*vec4(min(dot(normalize(sunRot),texCoord),1)/sunRadius);"
-//    " outColor = texture(cubemap,texCoord);"
-    "}";
+    SHADER(
+    in vec3 texCoord;
+    out vec4 outColor;
+    uniform samplerCube cubemap;
+    void main()
+    {
+        outColor = texture(cubemap,texCoord);
+    }
+           );
 
     pxgShader* shader = new pxgShader;
     const char* vs = vs_source.c_str();
@@ -514,7 +466,7 @@ pxgShader* pxgShaderLib::InitSkyboxShader()
     shader->SetUniformTarget("M",PXG_MODEL);
     shader->AddUniform("VP", PXG_4FM);
     shader->SetUniformTarget("VP",PXG_VIEW_PROJECTION);
-    //shader->AddTexture(PXG_TEXTURE0,"cubemap");
+    shader->AddTexture(PXG_TEXTURE0,"cubemap");
     //shader->AddTexture(PXG_TEXTURE1, "clouds");
     return shader;
 }

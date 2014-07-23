@@ -126,26 +126,26 @@ bool pxgWorld::InitSkybox()
     pxgShader *sk = sl->InitSkyboxShader();
     if(sk==NULL)
         return false;
-    cloudShader = sl->InitCloudsShader();
-    cloudsMove = 0;
-    if(cloudShader==NULL)
-        return false;
+    //cloudShader = sl->InitCloudsShader();
+    //cloudsMove = 0;
+    //if(cloudShader==NULL)
+   //     return false;
     skybox->SetShader(sk);
-    pxgObject* clouds = ml->CreatePlaneMesh(1,1);
-    if(clouds==NULL)
-        return false;
-    clouds->Scale(glm::vec3(10000));
-    clouds->Translate(glm::vec3(0,cam->GetTranslation().z+700,0));
-    clouds->Rotate(glm::vec3(0,0,0));
-    clouds->Update();
+    //pxgObject* clouds = ml->CreatePlaneMesh(1,1);
+   // if(clouds==NULL)
+    //    return false;
+    //clouds->Scale(glm::vec3(10000));
+   // clouds->Translate(glm::vec3(0,cam->GetTranslation().z+700,0));
+    //clouds->Rotate(glm::vec3(0,0,0));
+   // clouds->Update();
     pxgTexture* tex = new pxgTexture();
     tex->LoadTexture("blends/noise1.png",PXG_FILTER_LINEAR|PXG_TEX_REPEAT_X|PXG_TEX_REPEAT_Y);
-    clouds->SetShader(cloudShader);
-    clouds->SetTexture(tex,PXG_TEXTURE0);
+   // clouds->SetShader(cloudShader);
+   // clouds->SetTexture(tex,PXG_TEXTURE0);
     root = new pxgScene;
     root->SetCamera(cam);
     root->AddObject(skybox);
-    root->AddObject(clouds);
+  //  root->AddObject(clouds);
     delete sl, ml;
     return true;
 }
