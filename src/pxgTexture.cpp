@@ -109,13 +109,11 @@ bool pxgTexture::LoadTexture(std::string fname, int flags)
 
         if(flags & PXG_FILTER_MIPMAP_NEAREST)
         {
-            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
         }
 
         if(flags & PXG_FILTER_MIPMAP_LINEAR)
         {
-            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         }
     }
