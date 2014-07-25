@@ -515,8 +515,7 @@ pxgObject* pxgMeshLib::LoadObjMulti(std::string fname)
                         //PXG::Log(v);
                         glm::vec3 p;
                         getline(ss,v,' '); //x
-                        PXG::Log(v);
-                        p.x = stof(std::string(v).c_str());
+                        p.x = stod(std::string(v).c_str());
                         //PXG::Log(std::to_string(p.x)+"");
                         getline(ss,v,' '); //y
                         p.y = stof(v);
