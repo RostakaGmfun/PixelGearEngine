@@ -99,7 +99,7 @@ void pxgCamera::Update()
 
 void pxgCamera::Translate(vec3 t)
 {
-    translationVector = t;
+    translationVector = -t;
     return;
 }
 
