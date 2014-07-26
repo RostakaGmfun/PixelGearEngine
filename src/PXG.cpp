@@ -363,6 +363,12 @@ void pxgEngine::RunAppSDL(pxgApp *app)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, app->GLMajor());
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, app->GLMinor());
 
+    if(app->NumSamples()>0)
+    {
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, app->NumSamples());
+    }
+
     if(app->DBuffer())
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
@@ -370,7 +376,7 @@ void pxgEngine::RunAppSDL(pxgApp *app)
     window = SDL_CreateWindow(app->Title().c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
     if(!window)
     {
-        PXG::Log("pxgRunAppSDL(): error creatinf window", ERR);
+        PXG::Log("pxgRunAppSDL(): error creating window", ERR);
         return;
     }
 

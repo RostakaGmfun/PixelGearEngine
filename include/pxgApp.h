@@ -13,7 +13,7 @@ class pxgEngine;
 
 struct pxgVideoSettings
 {
-    pxgVideoSettings(int w, int h, bool fs, bool db, bool vs, std::string title, int gl_major = 3, int gl_minor = 2):
+    pxgVideoSettings(int w, int h, bool fs, bool db, bool vs, std::string title, int gl_major = 3, int gl_minor = 2, int samples = 0):
         width(w),
         height(h),
         fullscreen(fs),
@@ -21,13 +21,15 @@ struct pxgVideoSettings
         vsync(vs),
         winTitle(title),
         glMajor(gl_major),
-        glMinor(gl_minor)
+        glMinor(gl_minor),
+        numSamples(samples)
     {}
     pxgVideoSettings() {}
     int width;
     int height;
     bool fullscreen;
     bool doubleBuffer;
+    int numSamples;
     bool vsync;
     std::string winTitle;
     int glMajor;
@@ -44,7 +46,8 @@ public:
         m_title(vs.winTitle), m_vsync(vs.vsync),
         m_dBuffer(vs.doubleBuffer),
         m_glMajor(vs.glMajor),
-        m_glMinor(vs.glMinor)
+        m_glMinor(vs.glMinor),
+        m_numSamples(vs.numSamples)
     {}
     virtual bool Init() = 0;
     virtual bool Frame() = 0;
@@ -58,6 +61,7 @@ public:
     pxgEngine* Engine() const { return m_pxg; }
     int GLMajor() const { return m_glMajor; }
     int GLMinor() const { return m_glMinor; }
+    int NumSamples() const { return m_numSamples; }
 protected:
     pxgEngine *m_pxg;
     int m_width;
@@ -68,6 +72,7 @@ protected:
     std::string m_title;
     int m_glMajor;
     int m_glMinor;
+    int m_numSamples;
 };
 
 #endif //PXG_APP_H
