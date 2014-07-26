@@ -71,7 +71,7 @@ public:
     bool LoadHeightmap(std::string fname, int flags);
 	bool LoadRawHeightmap(std::string fname, int flags, int width, int height);
     bool LoadArray(std::vector<std::string> fnames, int flags = PXG_TEX_REPEAT_X|PXG_TEX_REPEAT_Y|PXG_FILTER_MIPMAP_LINEAR);
-	bool LoadCubemap(std::string baseName, int flags);
+    bool LoadCubemap(std::string baseName, int flags = PXG_TEX_CLAMP_X|PXG_TEX_CLAMP_Y|PXG_TEX_CLAMP_Z|PXG_FILTER_MIPMAP_LINEAR);
     bool CreateEmptyTexture(int width, int height, PXG_TEXTURE_FORMAT format);
 	void Delete();
 	GLuint GetName();

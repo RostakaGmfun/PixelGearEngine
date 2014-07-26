@@ -70,8 +70,8 @@ void pxgScene::Update()
 {
 
     UpdateTransformation();
-    if(camera!=NULL)
-        camera->Update();
+    /*if(camera!=NULL)
+        camera->Update();*/
 
     for(int i = 0;i<objects.size();i++)
     {

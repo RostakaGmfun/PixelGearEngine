@@ -450,6 +450,7 @@ pxgShader* pxgShaderLib::InitSkyboxShader()
     void main()
     {
         outColor = texture(cubemap,texCoord);
+        //outColor = vec4(1);
     }
            );
 

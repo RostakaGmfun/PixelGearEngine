@@ -22,14 +22,13 @@ class pxgObject;
 class pxgTexture;
 class pxgTerrain;
 class pxgRigidBody;
-
 typedef unsigned int GLuint;
 
 class pxgWorld: public pxgNode
 {
 public:
     pxgWorld();
-    bool InitSkybox();
+    //bool InitSkybox();
 
     bool InitBullet();
     pxgPW* GetPW() const { return pw; }
@@ -48,7 +47,7 @@ public:
     void EnablePickingDebug( bool e) { debugPicking = e; }
     pxgShader* GetPickShader() const { return pickShader; }
 
-    void SetSkyboxTexture(pxgTexture* tex);
+    //void SetSkyboxTexture(pxgTexture* tex);
     void SetTerrain(pxgTerrain* t) { if(!t) return; terrain = t; t->SetWorld(this); }
     void Update();
     bool Render();
@@ -59,14 +58,18 @@ public:
     void Destroy() {}
     void AddScene(pxgScene* scene);
     void RemoveScene(pxgScene* scene);
+
+    void SetBackground(pxgScene* bg);
 private:
     std::vector<pxgScene*> scenes;
-    pxgObject* skybox;
-    pxgShader* cloudShader;
-    float cloudsMove;
-    pxgScene* root;
+    //pxgObject* skybox;
+    //pxgShader* cloudShader;
+    //float cloudsMove;
+    //pxgScene* root;
     pxgCamera* cam;
     pxgTerrain* terrain;
+
+    pxgScene* backgroundScene;
 
     bool postEnabled;
     GLuint postFramebuffer;

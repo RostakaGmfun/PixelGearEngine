@@ -24,10 +24,10 @@
 #include <pxgTools.h>
 
 
-pxgWorld::pxgWorld(): skybox(NULL), cam(NULL), root(NULL), terrain(NULL), pw(NULL), postRenderTarget(NULL),
+pxgWorld::pxgWorld(): skybox(NULL), cam(NULL), terrain(NULL), pw(NULL), postRenderTarget(NULL),
     postShader(NULL), frameQuad(NULL), postFramebuffer(0), postRenderbuffer(0), frameVAO(0), postEnabled(false),
     pickBuffer(NULL), pickFramebuffer(0), pickRenderbuffer(0), pickFrameQuad(NULL), pickScene(NULL), pickVAO(0),
-    pickingEnabled(false), debugPicking(false)
+    pickingEnabled(false), debugPicking(false), backgroundScene(NULL)
 {
 }
 
@@ -55,14 +55,15 @@ void pxgWorld::Update()
 {
     if(pw)
         pw->Update(1/60.f);
+    if(cam)
+        cam->Update();
     for(int i = 0; i<scenes.size();i++)
         scenes[i]->Update();
-    if(root==NULL||cam==NULL)
-        return;
-    root->Translate(cam->GetTranslation());
-    root->Update();
-    cloudShader->SetUniform("move",glm::value_ptr(glm::vec2(cloudsMove,cloudsMove)));
-    cloudsMove+=0.00005f;
+    if(backgroundScene&&cam)
+    {
+        backgroundScene->Translate(-cam->GetTranslation());
+        backgroundScene->Update();
+    }
     if(terrain) terrain->Update();
     return;
 }
@@ -81,13 +82,13 @@ bool pxgWorld::Render()
     for(int i = 0;i<scenes.size();i++)
         scenes[i]->Render();
     if(terrain) terrain->Render();
-    if(root!=NULL)
+    if(backgroundScene)
     {
         glCullFace(GL_FRONT);
         GLint oldDepthFunc;
         glGetIntegerv(GL_DEPTH_FUNC, &oldDepthFunc);
         glDepthFunc(GL_LEQUAL);
-        root->Render();
+        backgroundScene->Render();
         glCullFace(GL_BACK);
         glDepthFunc(oldDepthFunc);
     }
@@ -111,50 +112,14 @@ bool pxgWorld::Render()
     return true;
 }
 
-bool pxgWorld::InitSkybox()
+void pxgWorld::SetBackground(pxgScene *bg)
 {
-    if(cam==NULL||skybox!=NULL)
-        return false;
-    pxgMeshLib* ml = new pxgMeshLib();
-    skybox = ml->LoadFromFile("blends/sphere.obj", PXG_WAVEFRONT_OBJ);
-    if(skybox==NULL)
-        return false;
-    skybox->Scale(glm::vec3(cam->GetFar()));
-    skybox->Translate(glm::vec3(cam->GetTranslation()));
-    skybox->Update();
-    pxgShaderLib* sl = new pxgShaderLib;
-    pxgShader *sk = sl->InitSkyboxShader();
-    if(sk==NULL)
-        return false;
-    //cloudShader = sl->InitCloudsShader();
-    //cloudsMove = 0;
-    //if(cloudShader==NULL)
-   //     return false;
-    skybox->SetShader(sk);
-    //pxgObject* clouds = ml->CreatePlaneMesh(1,1);
-   // if(clouds==NULL)
-    //    return false;
-    //clouds->Scale(glm::vec3(10000));
-   // clouds->Translate(glm::vec3(0,cam->GetTranslation().z+700,0));
-    //clouds->Rotate(glm::vec3(0,0,0));
-   // clouds->Update();
-    pxgTexture* tex = new pxgTexture();
-    tex->LoadTexture("blends/noise1.png",PXG_FILTER_LINEAR|PXG_TEX_REPEAT_X|PXG_TEX_REPEAT_Y);
-   // clouds->SetShader(cloudShader);
-   // clouds->SetTexture(tex,PXG_TEXTURE0);
-    root = new pxgScene;
-    root->SetCamera(cam);
-    root->AddObject(skybox);
-  //  root->AddObject(clouds);
-    delete sl, ml;
-    return true;
-}
- void pxgWorld::SetSkyboxTexture(pxgTexture* tex)
- {
-    if(tex==NULL)
+    if(!bg)
         return;
-    skybox->SetTexture(tex,PXG_TEXTURE0);
- }
+    backgroundScene = bg;
+    backgroundScene->SetWorld(this);
+    backgroundScene->SetCamera(cam);
+}
 
 bool pxgWorld::InitBullet()
 {
@@ -178,6 +143,7 @@ void pxgWorld::SetCamera(pxgCamera* c)
     cam = c;
     for(int i = 0;i<scenes.size();i++)
         scenes[i]->SetCamera(cam);
+    backgroundScene->SetCamera(cam);
 }
 
 bool pxgWorld::InitPostProcess(int width, int height)
