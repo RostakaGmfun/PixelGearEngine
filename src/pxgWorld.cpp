@@ -24,7 +24,7 @@
 #include <pxgTools.h>
 
 
-pxgWorld::pxgWorld(): skybox(NULL), cam(NULL), terrain(NULL), pw(NULL), postRenderTarget(NULL),
+pxgWorld::pxgWorld(): cam(NULL), terrain(NULL), pw(NULL), postRenderTarget(NULL),
     postShader(NULL), frameQuad(NULL), postFramebuffer(0), postRenderbuffer(0), frameVAO(0), postEnabled(false),
     pickBuffer(NULL), pickFramebuffer(0), pickRenderbuffer(0), pickFrameQuad(NULL), pickScene(NULL), pickVAO(0),
     pickingEnabled(false), debugPicking(false), backgroundScene(NULL)
