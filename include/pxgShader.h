@@ -69,7 +69,7 @@ public:
 	void SetVertexLayout(PXG_VERTEX_LAYOUT layout, std::vector<std::string> attributes);
 	bool FS(const char **source);
 	bool Link(PXG_VERTEX_LAYOUT layout, std::vector<std::string> attributeNames);
-    bool LinkTransformFeedback(PXG_VERTEX_LAYOUT layout, std::vector<std::string> feedbackVaryings);
+    bool LinkTransformFeedback(PXG_VERTEX_LAYOUT layout, std::vector<std::string> feedbackVaryings, std::vector<std::string> attributeNames);
 
 	GLuint GetProgram() const { return program; }
 	GLuint GetVS() const { return vs; }

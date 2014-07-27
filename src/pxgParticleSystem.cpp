@@ -20,10 +20,11 @@ std::string pxgParticleSystem::pxgDefaultUpdateFunc =
             void pxgParticleUpdateFunc()
             {
                 Velocity = particleVelocity+particleAcceleration;
-                Poisition = particlePos+Velocity;
+                Position = particlePos+Velocity;
                 Acceleration = particleAcceleration;
                 Age = particleAge+1;
                 Size = particleSize;
+                Color = particleColor;
             }
             );
 
@@ -43,12 +44,14 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
             in vec3 particlePos;
             in vec3 particleVelocity;
             in vec3 particleAcceleration;
+            in vec4 particleColor;
             in float particleSize;
             in float particleAge;
 
             out vec3 Position;
             out vec3 Velocity;
             out vec3 Acceleration;
+            out vec4 Color;
             out float Size;
             out float Age;
 
@@ -66,24 +69,86 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
 
             );
 
-    std::string update_fs_src =
-            "#version 130\n"
-            SHADER(
-                void main()
-                {
-                    discard;
-                }
-                );
-
     const char* vs1 = update_vs_src.c_str();
-    const char* fs1 = update_fs_src.c_str();
     updateShader->VS(&vs1);
-    //updateShader->FS(&fs1);
+    std::vector<std::string> varyings;
+    varyings.push_back("Position");
+    varyings.push_back("Velocity");
+    varyings.push_back("Acceleration");
+    varyings.push_back("Color");
+    varyings.push_back("Age");
+    varyings.push_back("Size");
     std::vector<std::string> attribs;
     attribs.push_back("particlePos");
     attribs.push_back("particleVelocity");
     attribs.push_back("particleAcceleration");
-    attribs.push_back("particleAge");
+    attribs.push_back("particleColor");
     attribs.push_back("particleSize");
-    updateShader->LinkTransformFeedback(PXG_VERTEX2D,attribs);
+    attribs.push_back("particleAge");
+    updateShader->LinkTransformFeedback(PXG_VERTEX2D,varyings,attribs);
+
+    const char* vs_render =
+            "#version 130\n"
+            SHADER(
+                in vec3 particlePos;
+                in vec3 particleVelocity;
+                in vec3 particleAcceleration;
+                in vec4 particleColor;
+                in float particleSize;
+                in float particleAge;
+
+                out vec4 Color;
+
+                uniform mat4 MVP;
+
+                void main()
+                {
+                    gl_PointSize = particleSize;
+                    gl_Position = MVP* vec4(particlePos,1);
+                    Color = particleColor;
+                }
+
+                );
+
+    const char* fs_render =
+    "#version 130\n"
+    SHADER(
+        in vec4 Color;
+
+        out vec4 outColor;
+
+        uniform sampler2D diffuse;
+        uniform bool useTexture;
+
+        void main()
+        {
+            if(useTexture)
+                outColor = texture(diffuse,gl_PointCoord);
+            else
+                outColor = Color;
+            if(outColor.a<=0.01)
+                discard;
+        }
+    );
+
+    renderShader = new pxgShader();
+    renderShader->VS(&vs_render);
+    renderShader->FS(&fs_render);
+    renderShader->Link(PXG_VERTEX2D,attribs);
+
+}
+
+void pxgParticleSystem::Update()
+{
+
+}
+
+bool pxgParticleSystem::Render()
+{
+
+}
+
+void pxgParticleSystem::Destroy()
+{
+
 }

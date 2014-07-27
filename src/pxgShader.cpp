@@ -119,7 +119,7 @@ bool pxgShader::Link(PXG_VERTEX_LAYOUT layout, std::vector<std::string> attribut
 	return true;
 }
 
-bool pxgShader::LinkTransformFeedback(PXG_VERTEX_LAYOUT layout, std::vector<std::string> feedbackVaryings)
+bool pxgShader::LinkTransformFeedback(PXG_VERTEX_LAYOUT layout, std::vector<std::string> feedbackVaryings, std::vector<std::string> attributeNames)
 {
     if(vs==0)
     {
@@ -138,10 +138,10 @@ bool pxgShader::LinkTransformFeedback(PXG_VERTEX_LAYOUT layout, std::vector<std:
 
     for(int i = 0; i< feedbackVaryings.size();i++)
     {
-        PXG::glBindAttribLocation(program,PXG_POSITION+i,feedbackVaryings[PXG_POSITION+i].c_str());
+        PXG::glBindAttribLocation(program,PXG_POSITION+i,attributeNames[PXG_POSITION+i].c_str());
     }
 
-    PXG::glTransformFeedbackVaryings(program,feedbackVaryings.size(),&feedbackVaryings[0], GL_INTERLEAVED_ATTRIBS);
+    PXG::glTransformFeedbackVaryings(program,feedbackVaryings.size(),(const GLchar* const *)&feedbackVaryings[0], GL_INTERLEAVED_ATTRIBS);
 
     PXG::glAttachShader(program, vs);
     PXG::glLinkProgram(program);
