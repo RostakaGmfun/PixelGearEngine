@@ -119,6 +119,44 @@ bool pxgShader::Link(PXG_VERTEX_LAYOUT layout, std::vector<std::string> attribut
 	return true;
 }
 
+bool pxgShader::LinkTransformFeedback(PXG_VERTEX_LAYOUT layout, std::vector<std::string> feedbackVaryings)
+{
+    if(vs==0)
+    {
+        PXG::Log("pxgShader::LinkTransformFeedback() error: vertex shader not compiled", ERR);
+        return false;
+    }
+
+    vertexLayout = layout;
+
+    program = PXG::glCreateProgram();
+    if(!program)
+    {
+        PXG::Log("pxgShader::LinkTransformFeedback(): error creating shader program object", ERR);
+        return false;
+    }
+
+    for(int i = 0; i< feedbackVaryings.size();i++)
+    {
+        PXG::glBindAttribLocation(program,PXG_POSITION+i,feedbackVaryings[PXG_POSITION+i].c_str());
+    }
+
+    PXG::glTransformFeedbackVaryings(program,feedbackVaryings.size(),&feedbackVaryings[0], GL_INTERLEAVED_ATTRIBS);
+
+    PXG::glAttachShader(program, vs);
+    PXG::glLinkProgram(program);
+    GLint status;
+    PXG::glGetProgramiv(program, GL_LINK_STATUS, &status);
+    if(status != GL_TRUE)
+    {
+        PXG::Log("pxgShader::LinkTransfromFeedback(): error linking shader",ERR);
+        PXG::Log(GetProgramLog(),ERR);
+        return false;
+    }
+    PXG::Log("pxgShader::LinkTransformFeedback(): successfully linked program with name: "+ std::to_string(program));
+    return true;
+}
+
 void pxgShader::Destroy()
 {
 	PXG::glDeleteProgram(program);

@@ -8,11 +8,11 @@
 #define PXGPARTICLESYSTEM_H
 
 class pxgBuffer;
-class pxgTexture;
 class pxgMaterial;
 class pxgScene;
+class pxgShader;
 
-enum PXG_TEXTURE_STAGE;
+#include <pxgTexture.h>
 
 #include <pxgNode.h>
 #include <glm/fwd.hpp>
@@ -29,11 +29,24 @@ public:
     void SetStartVelocityRange(glm::vec3 min, glm::vec3 max);
     void SetLifetimeRange(float min, float max);
     void SetSpawnRadius(float r);
+    void SetAccelerationRange(glm::vec3 min, glm::vec3 max);
 
 
     bool Render();
     void Update();
     void Destroy();
+
+    static std::string pxgDefaultUpdateFunc;
+
+private:
+    GLuint feedbacks[2];
+    GLuint bufferA;
+    GLuint bufferB;
+
+    pxgShader* updateShader;
+    pxgShader* renderShader;
+
+
 
 };
 

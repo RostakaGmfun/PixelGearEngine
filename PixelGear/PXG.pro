@@ -34,7 +34,8 @@ SOURCES += \
     ../src/pxgCollisionShape.cpp \
     ../src/pxgTools.cpp \
     ../src/pxgWorld.cpp \
-    ../src/pxgHUDWidget.cpp
+    ../src/pxgHUDWidget.cpp \
+    ../src/pxgParticleSystem.cpp
 
 
 HEADERS += \
