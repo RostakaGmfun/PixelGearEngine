@@ -65,6 +65,8 @@ private:
     float spawnRadius;
     glm::vec3 minAcceleration;
     glm::vec3 maxAcceleration;
+    int spawnRate;
+    int maxParticles;
 
     struct Particle
     {

@@ -9,9 +9,16 @@
 #include <pxgShader.h>
 #include <pxgScene.h>
 
+#include <glm/glm.hpp>
+
+using namespace glm;
+
 #define SHADER(s) #s
 
-pxgParticleSystem::pxgParticleSystem(): pxgNode(), updateShader(NULL), renderShader(NULL), scene(NULL), texture(NULL)
+pxgParticleSystem::pxgParticleSystem(): pxgNode(), updateShader(NULL), renderShader(NULL), scene(NULL), texture(NULL),
+    minSize(1), maxSize(1), minRot(vec3(0,0,0)), maxRot(vec3(0,0,0)), minStartVel(vec3(0,1,0)), maxStartVel(vec3(0,1,0)),
+    minLifetime(100), maxLifetime(100), spawnRadius(0), minAcceleration(vec3(0,0.05f,0)), maxAcceleration(vec3(0,0.1f,0)),
+    spawnRate(1), maxParticles(0)
 {
 
 }
@@ -20,12 +27,54 @@ std::string pxgParticleSystem::pxgDefaultUpdateFunc =
         SHADER(
             void pxgParticleUpdateFunc()
             {
-                Velocity = particleVelocity+particleAcceleration;
-                Position = particlePos+Velocity;
-                Acceleration = particleAcceleration;
-                Age = particleAge+1;
-                Size = particleSize;
-                Color = particleColor;
+                float _age = Age[0]+1;
+                if(Type[0]==0) //emitter particle
+                {
+                    int numV = numVertsPerStep;
+                    if(numV>MAX_VERTS)
+                        numV = MAX_VERTS;
+                    for(int i = 0;i<numV; i++)
+                    {
+                        type = 1; //normal particle
+                        position = Position[0];
+                        velocity = uVelocity;
+                        acceleration = uAcceleration;
+                        color = uColor;
+                        size = uSize;
+                        age = 0;
+                        lifetime = uLifetime;
+                        EmitVertex(); //emit new particle
+                        EndPrimitive();
+                    }
+
+                    type = 0;
+                    position = Position[0];
+                    velocity = Velocity[0];
+                    acceleration = Acceleration[0];
+                    color = Color[0];
+                    size = Size[0];
+                    age = _age;
+                    EmitVertex(); //emit emitter :D
+                    EndPrimitive();
+
+                }
+                else //regular particles
+                {
+                    if(_age<=Lifetime[0])
+                    {
+                        type = Type[0];
+                        position = Position[0];
+                        velocity = Velocity[0];
+                        acceleration = Acceleration[0];
+                        velocity+=acceleration;
+                        position+=velocity;
+                        color = Color[0];
+                        size = Size[0];
+                        age = _age;
+                        EmitVertex(); //emit regular vertex wich is still alive
+                        EndPrimitive();
+                    }
+                }
             }
             );
 
@@ -37,10 +86,8 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
         return;
     }
 
-    updateShader = new pxgShader();
-    std::string update_vs_src =
-           std::string(
-            "#version 130\n"
+    const char* update_vs_src =
+            "#version 150\n"
             SHADER(
             in vec3 particlePos;
             in vec3 particleVelocity;
@@ -48,6 +95,8 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
             in vec4 particleColor;
             in float particleSize;
             in float particleAge;
+            in float particleLifetime;
+            in int particleType;
 
             out vec3 Position;
             out vec3 Velocity;
@@ -55,30 +104,81 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
             out vec4 Color;
             out float Size;
             out float Age;
-
-            uniform float Time;
-            uniform float particleLifetime;
+            out float Lifetime;
+            out int Type;
 
             uniform mat4 MVP;
-            ))+"\n"+particleFunc+"\n"
-            SHADER(
 
             void main()
             {
-                pxgParticleUpdateFunc();
+                Velocity = particleVelocity;
+                Position = particlePos;
+                Acceleration = particleAcceleration;
+                Age = particleAge;
+                Lifetime = particleLifetime;
+                Size = particleSize;
+                Color = particleColor;
+                Type = particleType;
             }
 
             );
 
-    const char* vs1 = update_vs_src.c_str();
-    updateShader->VS(&vs1);
+    std::string update_gs_src =
+            "#version 330\n"
+            "#define MAX_VERTS 30 \n"
+            SHADER(
+
+                layout ( points ) in;
+                layout ( points, max_vertices = MAX_VERTS ) out;
+
+                in vec3 Position[];
+                in vec3 Velocity[];
+                in vec3 Acceleration[];
+                in vec4 Color[];
+                in float Size[];
+                in float Age[];
+                in float Lifetime[];
+                in int Type[];
+
+                out vec3 position;
+                out vec3 velocity;
+                out vec3 acceleration;
+                out vec4 color;
+                out float size;
+                out float lifetime;
+                out float age;
+                out int type;
+
+                uniform int numVertsPerStep;
+                uniform vec3 uVelocity;
+                uniform vec3 uAcceleration;
+                uniform vec4 uColor;
+                uniform float uSize;
+                uniform int uLifetime;
+
+                )"\n"+particleFunc+"\n"
+                SHADER(
+
+                void main()
+                {
+                    pxgParticleUpdateFunc();
+                }
+
+                );
+
+    updateShader = new pxgShader();
+
+    const char* gs1 = update_gs_src.c_str();
+    updateShader->VS(&update_vs_src);
+    updateShader->GS(&gs1);
     std::vector<std::string> varyings;
-    varyings.push_back("Position");
-    varyings.push_back("Velocity");
-    varyings.push_back("Acceleration");
-    varyings.push_back("Color");
-    varyings.push_back("Age");
-    varyings.push_back("Size");
+    varyings.push_back("position");
+    varyings.push_back("velocity");
+    varyings.push_back("acceleration");
+    varyings.push_back("color");
+    varyings.push_back("age");
+    varyings.push_back("size");
+    varyings.push_back("type");
     std::vector<std::string> attribs;
     attribs.push_back("particlePos");
     attribs.push_back("particleVelocity");
@@ -86,10 +186,11 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
     attribs.push_back("particleColor");
     attribs.push_back("particleSize");
     attribs.push_back("particleAge");
+    attribs.push_back("particleType");
     updateShader->LinkTransformFeedback(PXG_VERTEX2D,varyings,attribs);
 
     const char* vs_render =
-            "#version 130\n"
+            "#version 150\n"
             SHADER(
                 in vec3 particlePos;
                 in vec3 particleVelocity;
@@ -97,6 +198,7 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
                 in vec4 particleColor;
                 in float particleSize;
                 in float particleAge;
+                in int particleType;
 
                 out vec4 Color;
 
@@ -112,7 +214,7 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
                 );
 
     const char* fs_render =
-    "#version 130\n"
+    "#version 150\n"
     SHADER(
         in vec4 Color;
 
@@ -144,10 +246,9 @@ void pxgParticleSystem::InitBuffers()
     PXG::glGenTransformFeedbacks(2,feedbacks);
     PXG::glGenBuffers(2,buffers);
 
-    int maxParticles =
     Particle particles[100];
 
-    for(int i = 0;i< 2;i++)
+    for(int i = 0;i<2;i++)
     {
         PXG::glBindTransfromFeedback(GL_TRANSFORM_FEEDBACK, feedbacks[i]);
         PXG::glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
@@ -164,7 +265,7 @@ void pxgParticleSystem::Update()
 
 bool pxgParticleSystem::Render()
 {
-
+    return true;
 }
 
 void pxgParticleSystem::Destroy()
