@@ -68,12 +68,14 @@ public:
 	bool VS(const char **source);
 	void SetVertexLayout(PXG_VERTEX_LAYOUT layout, std::vector<std::string> attributes);
 	bool FS(const char **source);
+    bool GS(const char **source);
 	bool Link(PXG_VERTEX_LAYOUT layout, std::vector<std::string> attributeNames);
     bool LinkTransformFeedback(PXG_VERTEX_LAYOUT layout, std::vector<std::string> feedbackVaryings, std::vector<std::string> attributeNames);
 
 	GLuint GetProgram() const { return program; }
 	GLuint GetVS() const { return vs; }
 	GLuint GetFS() const { return fs; }
+    GLuint GetGS() const { return gs; }
 	bool Use();
 	void UseTexture(GLint stage, std::string name);
 	bool AddTexture(PXG_TEXTURE_STAGE stage, std::string textureName);
@@ -90,12 +92,16 @@ public:
 	void SetLightCount(int numLights);
 
 	std::string GetVSLog();
+    std::string GetGSLog();
 	std::string GetFSLog();
 	std::string GetProgramLog();
 	void Destroy();
 private:
 	const char *vsSource,*fsSource;
-	GLuint vs, fs, program;
+    GLuint vs;
+    GLuint gs;
+    GLuint fs;
+    GLuint program;
 	std::map<PXG_UNIFORM, std::string> uniformTargets;
     std::map<std::string, __Uniform*> uniforms;
 

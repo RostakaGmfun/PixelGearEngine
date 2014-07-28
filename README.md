@@ -11,6 +11,7 @@ Release version: 0.5 unstable.
 So far, PixelGear features:
 * Loading meshes with materials from Wavefront OBJ format ( tested with Blender exporter )
 * Loading textures from various image formats ( powered by SOIL )
+* Compiling vertex, geometry and fragment shaders
 * Shader system, which supports basic stuff for developing your own shaders ( uniforms, attributes and textures )
 * Shader library which provides basic shaders
 * Simple lighting system

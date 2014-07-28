@@ -12,7 +12,7 @@
 
 using namespace std;
 
-pxgShader::pxgShader():lightCount(0)
+pxgShader::pxgShader():lightCount(0), vs(0), gs(0), fs(0), program(0), u_numLights(0)
 {
 }
 pxgShader::~pxgShader()
@@ -65,6 +65,31 @@ void pxgShader::SetVertexLayout(PXG_VERTEX_LAYOUT layout, std::vector<std::strin
     }
 }
 
+bool pxgShader::GS(const char **source)
+{
+    gs = PXG::glCreateShader(GL_GEOMETRY_SHADER);
+
+    if(gs==0)
+    {
+        PXG::Log("pxgShader::GS(): failed to create shader object",ERR);
+        return false;
+    }
+    PXG::Log("pxgShader::GS(): created shader object with name: "+std::to_string(gs));
+    PXG::glShaderSource(gs,1,source,NULL);
+    PXG::glCompileShader(gs);
+
+    GLint status;
+    PXG::glGetShaderiv(gs, GL_COMPILE_STATUS, &status);
+    if(status != GL_TRUE)
+    {
+        PXG::Log("pxgShader::GS(): error compiling shader",ERR);
+        PXG::Log(GetGSLog(),ERR);
+        return false;
+    }
+    PXG::Log("pxgShader::GS(): successfully compiled shader");
+    return true;
+}
+
 bool pxgShader::FS(const char **src)
 {
 	fs = PXG::glCreateShader(GL_FRAGMENT_SHADER);
@@ -91,11 +116,6 @@ bool pxgShader::FS(const char **src)
 
 bool pxgShader::Link(PXG_VERTEX_LAYOUT layout, std::vector<std::string> attributeNames)
 {
-	if(vs==0||fs==0)
-	{
-	    PXG::Log("pxgShader::Link(): vertex or fragment shader is not compiled. Cannot to link program",WARN);
-		return false;
-	}
 	vertexLayout = layout;
 	program = PXG::glCreateProgram();
 	if(program==0)
@@ -103,8 +123,12 @@ bool pxgShader::Link(PXG_VERTEX_LAYOUT layout, std::vector<std::string> attribut
         PXG::Log("pxgShader::Link(): error creating programm object", ERR);
         return false;
     }
-	PXG::glAttachShader(program,vs);
-	PXG::glAttachShader(program,fs);
+    if(vs)
+        PXG::glAttachShader(program,vs);
+    if(gs)
+        PXG::glAttachShader(program,gs);
+    if(fs)
+        PXG::glAttachShader(program,fs);
 	SetVertexLayout(vertexLayout,attributeNames);
 	PXG::glLinkProgram(program);
 	GLint status;
@@ -173,6 +197,18 @@ std::string pxgShader::GetVSLog()
         return "";
     log = new char[length];
     PXG::glGetShaderInfoLog(vs, length, &result, log);
+    return log;
+}
+
+std::string pxgShader::GetGSLog()
+{
+    char *log;
+    GLint length, result;
+    PXG::glGetShaderiv(gs, GL_INFO_LOG_LENGTH, &length);
+    if(length<=0)
+        return "";
+    log = new char[length];
+    PXG::glGetShaderInfoLog(gs, length, &result, log);
     return log;
 }
 
