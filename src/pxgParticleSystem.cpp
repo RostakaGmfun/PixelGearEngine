@@ -7,10 +7,11 @@
 #include <pxgParticleSystem.h>
 #include <pxgTools.h>
 #include <pxgShader.h>
-#include <pxgShaderLib.h>
+#include <pxgScene.h>
 
-pxgParticleSystem::pxgParticleSystem(): pxgNode(), bufferA(0),
-    bufferB(0), updateShader(NULL), renderShader(NULL)
+#define SHADER(s) #s
+
+pxgParticleSystem::pxgParticleSystem(): pxgNode(), updateShader(NULL), renderShader(NULL), scene(NULL), texture(NULL)
 {
 
 }
@@ -135,6 +136,24 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
     renderShader->VS(&vs_render);
     renderShader->FS(&fs_render);
     renderShader->Link(PXG_VERTEX2D,attribs);
+
+}
+
+void pxgParticleSystem::InitBuffers()
+{
+    PXG::glGenTransformFeedbacks(2,feedbacks);
+    PXG::glGenBuffers(2,buffers);
+
+    int maxParticles =
+    Particle particles[100];
+
+    for(int i = 0;i< 2;i++)
+    {
+        PXG::glBindTransfromFeedback(GL_TRANSFORM_FEEDBACK, feedbacks[i]);
+        PXG::glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
+        PXG::glBufferData(GL_ARRAY_BUFFER,sizeof(particles), particles, GL_DYNAMIC_DRAW);
+        PXG::glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, buffers[0]);
+    }
 
 }
 

@@ -99,11 +99,12 @@ public:
     static PFNGLGETBUFFERPARAMETERIVPROC glGetBufferParameteriv;
     static PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData;
     static PFNGLGENTRANSFORMFEEDBACKSPROC glGenTransformFeedbacks;
-    static PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransfromFeedbacks;
+    static PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransfromFeedback;
     static PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransfromFeedback;
     static PFNGLENDTRANSFORMFEEDBACKPROC glEndTransformFeedback;
     static PFNGLDRAWTRANSFORMFEEDBACKPROC glDrawTransformFeedback;
     static PFNGLTRANSFORMFEEDBACKVARYINGSPROC glTransformFeedbackVaryings;
+    static PFNGLBINDBUFFERBASEPROC glBindBufferBase;
 
     static PXGLOG_LEVEL log_level;
     static std::ofstream log;
