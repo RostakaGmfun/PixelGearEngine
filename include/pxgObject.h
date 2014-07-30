@@ -109,13 +109,6 @@ public:
 
 private:
 
-    struct tex_t
-    {
-        tex_t(std::string n, pxgTexture* t): name(n), tex(t) {}
-        std::string name;
-        pxgTexture* tex;
-    };
-
     typedef std::vector<pxgObject*> MeshList;
 	MeshList meshList;
 

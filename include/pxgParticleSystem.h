@@ -21,16 +21,16 @@ class pxgParticleSystem: public pxgNode
 {
 public:
     pxgParticleSystem();
-    void InitShader(std::string particleFunc);
+    void InitShaders(std::string particleFunc);
     void InitBuffers();
-    void SetTexture(pxgTexture,PXG_TEXTURE_STAGE);
+    void SetTexture(pxgTexture* texture);
     void SetColors(std::vector<glm::vec4> colors);
     void SetSize(float min, float max);
     void SetRotationRange(glm::vec3 min, glm::vec3 max);
-    void SetStartVelocityRange(glm::vec3 min, glm::vec3 max);
-    void SetLifetimeRange(float min, float max);
+    void SetStartVelocity(glm::vec3 min, glm::vec3 max);
+    void SetLifetime(float min, float max);
     void SetSpawnRadius(float r);
-    void SetAccelerationRange(glm::vec3 min, glm::vec3 max);
+    void SetAcceleration(glm::vec3 min, glm::vec3 max);
     void SetSpawnRate(int particlesPerFrame);
     void SetMaxParticles(int max);
 
@@ -73,8 +73,11 @@ private:
         glm::vec3 pos;
         glm::vec3 velocity;
         glm::vec3 acceleration;
-        glm::vec3 lifetime;
+        float lifetime;
         glm::vec3 color;
+        float size;
+        float age;
+        int type;
     };
 
 

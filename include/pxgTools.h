@@ -99,8 +99,8 @@ public:
     static PFNGLGETBUFFERPARAMETERIVPROC glGetBufferParameteriv;
     static PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData;
     static PFNGLGENTRANSFORMFEEDBACKSPROC glGenTransformFeedbacks;
-    static PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransfromFeedback;
-    static PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransfromFeedback;
+    static PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransformFeedback;
+    static PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransformFeedback;
     static PFNGLENDTRANSFORMFEEDBACKPROC glEndTransformFeedback;
     static PFNGLDRAWTRANSFORMFEEDBACKPROC glDrawTransformFeedback;
     static PFNGLTRANSFORMFEEDBACKVARYINGSPROC glTransformFeedbackVaryings;

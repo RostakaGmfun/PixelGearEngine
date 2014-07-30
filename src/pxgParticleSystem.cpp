@@ -78,11 +78,11 @@ std::string pxgParticleSystem::pxgDefaultUpdateFunc =
             }
             );
 
-void pxgParticleSystem::InitShader(std::string particleFunc)
+void pxgParticleSystem::InitShaders(std::string particleFunc)
 {
     if(particleFunc.empty())
     {
-        PXG::Log("pxgParticleSystem::InitShader()  error: particleFunc is empty.", ERR);
+        PXG::Log("pxgParticleSystem::InitShaders()  error: particleFunc is empty.", ERR);
         return;
     }
 
@@ -238,24 +238,95 @@ void pxgParticleSystem::InitShader(std::string particleFunc)
     renderShader->VS(&vs_render);
     renderShader->FS(&fs_render);
     renderShader->Link(PXG_VERTEX2D,attribs);
+    PXG::Log("pxgParticleSystem::InitShaders(): successfully initialised shaders");
 
 }
 
 void pxgParticleSystem::InitBuffers()
 {
+    if(maxParticles<=0)
+    {
+        PXG::Log("pxgParticleSystem::InitBuffers() error: maxParticles<=0", ERR);
+        return;
+    }
     PXG::glGenTransformFeedbacks(2,feedbacks);
     PXG::glGenBuffers(2,buffers);
 
-    Particle particles[100];
+    Particle *particles = new Particle[maxParticles];
+    particles[0].lifetime = 0.0f;
+    particles[0].color = vec3(1.0f);
+    particles[0].type = 0; //launcher
+    particles[0].pos = vec3(0.0f);
+    particles[0].velocity = vec3(0,0.05f,0);
+    particles[0].acceleration = vec3(0,0.001f,0);
+    particles[0].size = 5.0f;
+    particles[0].age = 0.0f;
 
     for(int i = 0;i<2;i++)
     {
-        PXG::glBindTransfromFeedback(GL_TRANSFORM_FEEDBACK, feedbacks[i]);
-        PXG::glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
-        PXG::glBufferData(GL_ARRAY_BUFFER,sizeof(particles), particles, GL_DYNAMIC_DRAW);
-        PXG::glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, buffers[0]);
+        PXG::glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedbacks[i]);
+        PXG::glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+        PXG::glBufferData(GL_ARRAY_BUFFER,sizeof(Particle)*maxParticles, particles, GL_DYNAMIC_DRAW);
+        PXG::glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, buffers[i]);
     }
 
+    PXG::Log("pxgParticleSystem::InitBuffers(): successfully initialised particle buffers");
+
+}
+
+void pxgParticleSystem::SetTexture(pxgTexture* t)
+{
+    texture = t;
+}
+
+void pxgParticleSystem::SetColors(std::vector<vec4> cls)
+{
+    colors = cls;
+}
+
+void pxgParticleSystem::SetSize(float min, float max)
+{
+    minSize = min;
+    maxSize = max;
+}
+
+void pxgParticleSystem::SetRotationRange(vec3 min, vec3 max)
+{
+    minRot = min;
+    maxRot = max;
+}
+
+void pxgParticleSystem::SetStartVelocity(vec3 min, vec3 max)
+{
+    minStartVel = min;
+    maxStartVel = max;
+}
+
+void pxgParticleSystem::SetLifetime(float min, float max)
+{
+    minLifetime = min;
+    maxLifetime = max;
+}
+
+void pxgParticleSystem::SetSpawnRadius(float r)
+{
+    spawnRadius = r;
+}
+
+void pxgParticleSystem::SetAcceleration(vec3 min, vec3 max)
+{
+    minAcceleration = min;
+    maxAcceleration = max;
+}
+
+void pxgParticleSystem::SetSpawnRate(int particlesPerFrame)
+{
+    spawnRate = particlesPerFrame;
+}
+
+void pxgParticleSystem::SetMaxParticles(int max)
+{
+    maxParticles = max;
 }
 
 void pxgParticleSystem::Update()
