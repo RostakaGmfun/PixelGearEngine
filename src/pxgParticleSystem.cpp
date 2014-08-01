@@ -27,7 +27,7 @@ std::string pxgParticleSystem::pxgDefaultUpdateFunc =
         SHADER(
             void pxgParticleUpdateFunc()
             {
-                float _age = Age[0]+1;
+                int _age = Age[0]+1;
                 if(Type[0]==0) //emitter particle
                 {
                     int numV = numVertsPerStep;
@@ -54,6 +54,7 @@ std::string pxgParticleSystem::pxgDefaultUpdateFunc =
                     color = Color[0];
                     size = Size[0];
                     age = _age;
+                    lifetime = Lifetime[0];
                     EmitVertex(); //emit emitter :D
                     EndPrimitive();
 
@@ -71,6 +72,7 @@ std::string pxgParticleSystem::pxgDefaultUpdateFunc =
                         color = Color[0];
                         size = Size[0];
                         age = _age;
+                        lifetime = Lifetime[0];
                         EmitVertex(); //emit regular vertex wich is still alive
                         EndPrimitive();
                     }
@@ -92,22 +94,20 @@ void pxgParticleSystem::InitShaders(std::string particleFunc)
             in vec3 particlePos;
             in vec3 particleVelocity;
             in vec3 particleAcceleration;
+            in int particleLifetime;
             in vec4 particleColor;
             in float particleSize;
-            in float particleAge;
-            in float particleLifetime;
+            in int particleAge;
             in int particleType;
 
             out vec3 Position;
             out vec3 Velocity;
             out vec3 Acceleration;
+            out int Lifetime;
             out vec4 Color;
             out float Size;
-            out float Age;
-            out float Lifetime;
+            out int Age;
             out int Type;
-
-            uniform mat4 MVP;
 
             void main()
             {
@@ -124,7 +124,7 @@ void pxgParticleSystem::InitShaders(std::string particleFunc)
             );
 
     std::string update_gs_src =
-            "#version 330\n"
+            "#version 150\n"
             "#define MAX_VERTS 30 \n"
             SHADER(
 
@@ -134,19 +134,19 @@ void pxgParticleSystem::InitShaders(std::string particleFunc)
                 in vec3 Position[];
                 in vec3 Velocity[];
                 in vec3 Acceleration[];
+                in int Lifetime[];
                 in vec4 Color[];
                 in float Size[];
-                in float Age[];
-                in float Lifetime[];
+                in int Age[];
                 in int Type[];
 
                 out vec3 position;
                 out vec3 velocity;
                 out vec3 acceleration;
+                out int lifetime;
                 out vec4 color;
                 out float size;
-                out float lifetime;
-                out float age;
+                out int age;
                 out int type;
 
                 uniform int numVertsPerStep;
@@ -171,18 +171,21 @@ void pxgParticleSystem::InitShaders(std::string particleFunc)
     const char* gs1 = update_gs_src.c_str();
     updateShader->VS(&update_vs_src);
     updateShader->GS(&gs1);
+
     std::vector<std::string> varyings;
     varyings.push_back("position");
     varyings.push_back("velocity");
     varyings.push_back("acceleration");
+    varyings.push_back("lifetime");
     varyings.push_back("color");
-    varyings.push_back("age");
     varyings.push_back("size");
+    varyings.push_back("age");
     varyings.push_back("type");
     std::vector<std::string> attribs;
     attribs.push_back("particlePos");
     attribs.push_back("particleVelocity");
     attribs.push_back("particleAcceleration");
+    attribs.push_back("particleLifetime");
     attribs.push_back("particleColor");
     attribs.push_back("particleSize");
     attribs.push_back("particleAge");
@@ -195,9 +198,10 @@ void pxgParticleSystem::InitShaders(std::string particleFunc)
                 in vec3 particlePos;
                 in vec3 particleVelocity;
                 in vec3 particleAcceleration;
+                in int particleLifetime;
                 in vec4 particleColor;
                 in float particleSize;
-                in float particleAge;
+                in int particleAge;
                 in int particleType;
 
                 out vec4 Color;
@@ -238,7 +242,27 @@ void pxgParticleSystem::InitShaders(std::string particleFunc)
     renderShader->VS(&vs_render);
     renderShader->FS(&fs_render);
     renderShader->Link(PXG_VERTEX2D,attribs);
-    PXG::Log("pxgParticleSystem::InitShaders(): successfully initialised shaders");
+
+    PXG::glGenVertexArrays(1,&vao);
+    PXG::glBindVertexArray(vao);
+    PXG::glVertexAttribPointer(0,sizeof(vec3)/4,GL_FLOAT,GL_FALSE,sizeof(Particle),(void*)offsetof(Particle,pos)); //position;
+    PXG::glEnableVertexAttribArray(0);
+    PXG::glVertexAttribPointer(1,sizeof(vec3)/4,GL_FLOAT,GL_FALSE,sizeof(Particle),(void*)offsetof(Particle,velocity)); //velocity;
+    PXG::glEnableVertexAttribArray(1);
+    PXG::glVertexAttribPointer(2,sizeof(vec3)/4,GL_FLOAT,GL_FALSE,sizeof(Particle),(void*)offsetof(Particle,acceleration)); //acceleration;
+    PXG::glEnableVertexAttribArray(2);
+    PXG::glVertexAttribIPointer(3,sizeof(int)/4,GL_INT,sizeof(Particle),(void*)offsetof(Particle,lifetime)); //lifetime;
+    PXG::glEnableVertexAttribArray(3);
+    PXG::glVertexAttribPointer(4,sizeof(vec4)/4,GL_FLOAT,GL_FALSE,sizeof(Particle),(void*)offsetof(Particle,color)); //color;
+    PXG::glEnableVertexAttribArray(4);
+    PXG::glVertexAttribIPointer(5,sizeof(int)/4,GL_INT,sizeof(Particle),(void*)offsetof(Particle,age)); //age;
+    PXG::glEnableVertexAttribArray(5);
+    PXG::glVertexAttribPointer(6,sizeof(float)/4,GL_FLOAT,GL_FALSE,sizeof(Particle),(void*)offsetof(Particle,size)); //size;
+    PXG::glEnableVertexAttribArray(6);
+    PXG::glVertexAttribIPointer(7,sizeof(int)/4,GL_INT,sizeof(Particle),(void*)offsetof(Particle,type)); //type;
+    PXG::glEnableVertexAttribArray(7);
+
+    PXG::Log("pxgParticleSystem::InitShaders(): successfully initialised shaders and vertex array object");
 
 }
 
@@ -271,6 +295,16 @@ void pxgParticleSystem::InitBuffers()
     }
 
     PXG::Log("pxgParticleSystem::InitBuffers(): successfully initialised particle buffers");
+
+}
+
+bool pxgParticleSystem::Render()
+{
+
+}
+
+void pxgParticleSystem::Update()
+{
 
 }
 

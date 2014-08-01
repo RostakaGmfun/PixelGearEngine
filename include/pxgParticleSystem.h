@@ -46,6 +46,7 @@ public:
 private:
     GLuint feedbacks[2];
     GLuint buffers[2];
+    GLuint vao;
 
     pxgShader* updateShader;
     pxgShader* renderShader;
@@ -73,10 +74,10 @@ private:
         glm::vec3 pos;
         glm::vec3 velocity;
         glm::vec3 acceleration;
-        float lifetime;
+        int lifetime;
         glm::vec3 color;
         float size;
-        float age;
+        int age;
         int type;
     };
 
